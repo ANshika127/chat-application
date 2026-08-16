@@ -138,7 +138,7 @@ def login_user():
 @jwt_required()
 def get_current_user():
 
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     user = User.query.get(user_id) 
 
     if not user:
@@ -150,12 +150,100 @@ def get_current_user():
         "name": user.name,
         "email": user.email,
         "phone_no": user.phone_no,
-        "dob": user.dob,
+        "dob": str(user.dob) if user.dob else None,
         "profile_picture": user.profile_picture,
         "bio": user.bio
     },200
     
+@app.route("/users/me", methods=["PUT"])
+@jwt_required()
+def update_current_user():
 
+    user_id = int(get_jwt_identity())
 
+    user = User.query.get(user_id)
+
+    if not user:
+        return {"error": "User not found"}, 404
+
+    data = request.get_json()
+
+    if not data:
+        return {"error": "Request body is required"}, 400
+
+    name = data.get("name")
+    username = data.get("username")
+    phone_no = data.get("phone_no")
+    dob = data.get("dob")
+    profile_picture = data.get("profile_picture")
+    bio = data.get("bio")
+
+    # Username validation
+    if username is not None:
+        username = username.strip()
+
+        if len(username) < 3 or len(username) > 30:
+            return {
+                "error": "Username must be between 3 and 30 characters"
+            }, 400
+
+        existing_user = User.query.filter(
+            User.username == username,
+            User.user_id != user_id
+        ).first()
+
+        if existing_user:
+            return {"error": "Username already exists"}, 409
+
+        user.username = username
+
+    # Name validation
+    if name is not None:
+        name = name.strip()
+
+        if not name:
+            return {"error": "Name cannot be empty"}, 400
+
+        if len(name) > 100:
+            return {"error": "Name cannot exceed 100 characters"}, 400
+
+        user.name = name
+
+    # Phone validation
+    if phone_no is not None:
+
+        if phone_no != "" and not re.fullmatch(r"\d{10}", phone_no):
+            return {
+                "error": "Phone number must contain exactly 10 digits"
+            }, 400
+
+        if phone_no != "":
+            existing_phone = User.query.filter(
+                User.phone_no == phone_no,
+                User.user_id != user_id
+            ).first()
+
+            if existing_phone:
+                return {"error": "Phone number already exists"}, 409
+
+        user.phone_no = phone_no if phone_no != "" else None
+
+    # Optional fields
+    if dob is not None:
+        user.dob = dob
+
+    if profile_picture is not None:
+        user.profile_picture = profile_picture
+
+    if bio is not None:
+        user.bio = bio
+
+    db.session.commit()
+
+    return {
+        "message": "Profile updated successfully"
+    }, 200
+
+    
 if __name__ == "__main__":
     app.run(debug=True)

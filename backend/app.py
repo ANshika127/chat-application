@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import re
 import os 
 from sqlalchemy import URL
-from models import db, User
+from models import db, User, Chat, Chat_participant
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
@@ -243,6 +243,86 @@ def update_current_user():
     return {
         "message": "Profile updated successfully"
     }, 200
+
+@app.route("/chats", methods=["POST"])
+@jwt_required()
+def create_chat():
+
+    current_user_id = int(get_jwt_identity())
+
+    data = request.get_json()
+
+    if not data:
+        return {"error":" Request body is required "},400
+
+    target_user_id = data.get("user_id")
+
+    if target_user_id is None:
+        return {
+            "error":"Target User ID is required "
+        },400
+    
+    try:
+        target_user_id = int(target_user_id)
+    except(TypeError,ValueError):
+        return{
+            "error":"User ID must be an Integer"
+        },400
+
+    if target_user_id == current_user_id:
+        return{
+            "error":"You cant create a chat with yourself"
+        },400
+
+    target_user = User.query.get(target_user_id)
+
+    if not target_user:
+        return {
+            "error":"Target User Not Found"
+        },404
+
+    existing_chat=(
+        Chat.query
+        .join(Chat_participant)
+        .filter(Chat_participant.user_id == current_user_id)
+        .filter(
+            Chat.chat_id.in_(
+                db.session.query(Chat_participant.chat_id)
+                .filter(Chat_participant.user_id == target_user_id)
+            )
+        ).first()
+    )
+    
+    if existing_chat:
+        return{
+            "message":"Chat already exists",
+            "chat_id": existing_chat.chat_id
+        },200
+
+    new_chat =Chat()
+
+    db.session.add(new_chat)
+    db.session.flush()
+
+    participant_1= Chat_participant(
+        chat_id = new_chat.chat_id,
+        user_id = current_user_id
+    )
+    participant_2= Chat_participant(
+        chat_id = new_chat.chat_id,
+        user_id = target_user_id
+    )
+
+    db.session.add(participant_1)
+    db.session.add(participant_2)
+
+    db.session.commit()
+
+    return{
+        "message":"Chat created Successfully ",
+        "chat_id":new_chat.chat_id
+    },201
+
 
     
 if __name__ == "__main__":

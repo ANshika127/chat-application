@@ -50,3 +50,36 @@ class User(db.Model):
         db.Text,
         nullable=True
     )
+
+class Chat(db.Model):
+    __tablename__ = "chats"
+
+    chat_id = db.Column(db.Integer, primary_key= True)
+
+    created_at= db.Column(
+        db.DateTime,
+        nullable = False,
+        server_default = db.func.now()
+    )
+
+class Chat_participant(db.Model):
+    __tablename__ = "chat_participants"
+
+    chat_id = db.Column(
+        db.Integer,
+        db.ForeignKey("chats.chat_id",ondelete="CASCADE"),
+        primary_key= True
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.user_id",ondelete="CASCADE"),
+        primary_key=True
+    )
+
+    joined_at = db.Column(
+        db.DateTime,
+        nullable = False,
+        server_default =db.func.now()
+
+    )

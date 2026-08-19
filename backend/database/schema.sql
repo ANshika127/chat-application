@@ -51,9 +51,11 @@ CREATE TABLE messages(
                   CHECK (status IN ('sent','delivered','seen')),
 
   FOREIGN KEY(chat_id) 
-    REFERENCES chats(chat_id),
+    REFERENCES chats(chat_id)
+    ON DELETE CASCADE,
 
   FOREIGN KEY (sender_id)
     REFERENCES users(user_id)
+    ON DELETE CASCADE
 );
 

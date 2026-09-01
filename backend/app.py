@@ -323,7 +323,61 @@ def create_chat():
         "chat_id":new_chat.chat_id
     },201
 
+@app.route("/chats", methods=["GET"])
+@jwt_required()
+def get_chats():
 
+    current_user_id = int(get_jwt_identity())
+
+    # Get all chats in which current user is a participant
+    user_chats = (
+        Chat_participant.query
+        .filter(Chat_participant.user_id == current_user_id)
+        .all()
+    )
+
+    chats = []
+
+    for participant in user_chats:
+
+        chat = Chat.query.get(participant.chat_id)
+
+        if not chat:
+            continue
+
+        # Find the other participant
+        other_participant = (
+            Chat_participant.query
+            .filter(
+                Chat_participant.chat_id == chat.chat_id,
+                Chat_participant.user_id != current_user_id
+            )
+            .first()
+        )
+
+        if not other_participant:
+            continue
+
+        # Get the other user's details
+        other_user = User.query.get(other_participant.user_id)
+
+        if not other_user:
+            continue
+
+        chats.append({
+            "chat_id": chat.chat_id,
+            "created_at": chat.created_at,
+            "other_user": {
+                "user_id": other_user.user_id,
+                "username": other_user.username,
+                "name": other_user.name,
+                "profile_picture": other_user.profile_picture
+            }
+        })
+
+    return {
+        "chats": chats
+    }, 200
     
 if __name__ == "__main__":
     app.run(debug=True)

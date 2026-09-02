@@ -59,3 +59,6 @@ CREATE TABLE messages(
     ON DELETE CASCADE
 );
 
+CREATE INDEX idx_chat_messages
+ON messages(chat_id, message_id);
+

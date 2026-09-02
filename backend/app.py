@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import re
 import os 
 from sqlalchemy import URL
-from models import db, User, Chat, Chat_participant
+from models import db, User, Chat, Chat_participant,Messages
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
@@ -378,6 +378,132 @@ def get_chats():
     return {
         "chats": chats
     }, 200
+
+@app.route("/chats/<int:chat_id>/messages",methods=["POST"])
+@jwt_required()
+def send_message(chat_id):
+
+    current_user_id = int(get_jwt_identity())
+
+    data = request.get_json()
+
+    if not data:
+        return{
+            "error":"Request Body is required"
+        },400
+
+    content =data.get("content","").strip()
     
+    if not content:
+        return{
+            "error":"Message Content is required"
+        },400
+
+    chat = Chat.query.get(chat_id)
+    if not chat:
+        return{
+            "error":"Chat not found"
+        },404
+
+    participant =(
+        Chat_participant.query
+        .filter(
+        Chat_participant.chat_id == chat_id,
+        Chat_participant.user_id == current_user_id
+        ).first()
+    )
+
+    if not participant:
+        return{
+            "error":"You are not a participant of this chat"
+        },403
+
+    new_message = Messages(
+        chat_id = chat_id,
+        sender_id = current_user_id,
+        content = content,
+        message_type = "text",
+        status = "sent"
+    )
+
+    db.session.add(new_message)
+    db.session.commit()
+
+    return{
+        "message": "Message sent successfully",
+        "message_id": new_message.message_id
+    },201
+
+@app.route("/chats/<int:chat_id>/messages", methods=["GET"])
+@jwt_required()
+def get_messages(chat_id):
+
+    current_user_id = int(get_jwt_identity())
+
+    chat= Chat.query.get(chat_id)
+    if not chat:
+        return{
+            "error":"Chat Not Found"
+        },404
+
+    participant=(
+        Chat_participant.query
+        .filter(
+            Chat_participant.chat_id == chat_id,
+            Chat_participant.user_id == current_user_id 
+        ).first()
+    )
+
+    if not participant:
+        return{
+            "error":"You are not participant of this chat"
+        },403
+
+    limit =request.args.get("limit",50,type=int)
+
+    if limit<1 or limit>100:
+        return{
+            "error":"Limit must be between 1 and 100"
+        },400
+
+    before = request.args.get("before",type=int)
+
+    query=(
+        Messages.query
+        .filter(Messages.chat_id == chat_id)
+    )
+
+    if before:
+        query=query.filter(
+            Messages.message_id < before
+        )
+
+    messages=(
+        query
+        .order_by(Messages.message_id.desc())
+        .limit(limit)
+        .all()
+    )
+
+    messages.reverse()
+
+    return{
+        "messages":[
+            {
+                "message_id":message.message_id,
+                "sender_id":message.sender_id,
+                "content":message.content,
+                "message_type":message.message_type,
+                "sent_at":message.sent_at,
+                "status":message.status
+            }
+            for message in messages 
+        ]
+    },200
+
+    
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)

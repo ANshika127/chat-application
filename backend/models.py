@@ -83,3 +83,43 @@ class Chat_participant(db.Model):
         server_default =db.func.now()
 
     )
+
+class Messages(db.Model):
+    __tablename__ = "messages"
+
+    message_id = db.Column(
+        db.Integer,
+        primary_key= True
+    )
+
+    chat_id = db.Column(
+        db.Integer,
+        db.ForeignKey("chats.chat_id",ondelete="CASCADE"),
+        nullable = False
+    )
+
+    sender_id= db.Column(
+        db.Integer,
+        db.ForeignKey("users.user_id",ondelete="CASCADE"),
+        nullable = False
+    )
+
+    content = db.Column(
+        db.Text,
+        nullable = False
+    )
+
+    message_type= db.Column(
+        db.String(20),
+        nullable = False
+    )
+
+    sent_at = db.Column(
+        db.DateTime,
+        server_default =db.func.now()
+    )
+
+    status = db.Column(
+        db.String(20),
+        nullable = False
+    )

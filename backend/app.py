@@ -530,7 +530,31 @@ def get_messages(chat_id):
         ]
     },200
 
-    
+@app.route("/messages/<int:message_id>",methods=["DELETE"])
+@jwt_required()
+def delete_message(message_id):
+
+    current_user_id = int(get_jwt_identity())
+
+    message = Messages.query.get(message_id)
+
+    if not message:
+        return{
+            "error":"Message Not Found"
+        },404
+
+    if message.sender_id != current_user_id:
+        return{
+            "error":"You can only delete your own messages"
+        },403
+
+    db.session.delete(message)
+    db.session.commit()
+
+    return{
+        "message":"Message Deleted Successfully "
+    },200
+
 
 
 

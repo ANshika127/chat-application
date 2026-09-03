@@ -394,6 +394,13 @@ def send_message(chat_id):
 
     content =data.get("content","").strip()
 
+    message_type = data.get("message_type","text")
+
+    if message_type not in ["text","image","video","document","gif","audio"]:
+        return{
+            "error":"Invalid message type "
+        },400
+
     reply_to_message_id = data.get("reply_to_message_id")
 
     if reply_to_message_id is not None:
@@ -442,7 +449,7 @@ def send_message(chat_id):
         chat_id = chat_id,
         sender_id = current_user_id,
         content = content,
-        message_type = "text",
+        message_type = message_type,
         status = "sent",
         reply_to_message_id = reply_to_message_id
     )

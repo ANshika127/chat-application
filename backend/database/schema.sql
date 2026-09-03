@@ -43,6 +43,7 @@ CREATE TABLE messages(
    message_id     SERIAL      PRIMARY KEY,
    chat_id        INTEGER     NOT NULL,
    sender_id      INTEGER     NOT NULL,
+   reply_to_message_id        INTEGER,
    content        TEXT        NOT NULL,
    message_type   VARCHAR(20) NOT NULL
                   CHECK( message_type IN ('text','image','video','document','gif','audio')),
@@ -57,6 +58,10 @@ CREATE TABLE messages(
   FOREIGN KEY (sender_id)
     REFERENCES users(user_id)
     ON DELETE CASCADE
+
+  FOREIGN KEY(reply_to_message_id)
+    REFERENCES messages(message_id)
+    ON DELETE SET NULL 
 );
 
 CREATE INDEX idx_chat_messages

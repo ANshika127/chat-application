@@ -123,3 +123,9 @@ class Messages(db.Model):
         db.String(20),
         nullable = False
     )
+
+    reply_to_message_id = db.Column(
+        db.Integer,
+        db.ForeignKey("messages.message_id",ondelete="SET NULL"),
+        nullable = True
+    )

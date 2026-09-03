@@ -393,6 +393,26 @@ def send_message(chat_id):
         },400
 
     content =data.get("content","").strip()
+
+    reply_to_message_id = data.get("reply_to_message_id")
+
+    if reply_to_message_id is not None:
+        if not isinstance(reply_to_message_id,int):
+            return{
+                "error":"reply_to_message_id should be an integer"
+            },400
+
+        replied_message = Messages.query.get(reply_to_message_id)
+
+        if not replied_message:
+            return{
+                "error":"Message you are trying to reply to does not exist"
+            },404
+
+        if replied_message.chat_id != chat_id:
+            return{
+                "error":"You can only reply to messages of same chat"
+            },400
     
     if not content:
         return{
@@ -423,7 +443,8 @@ def send_message(chat_id):
         sender_id = current_user_id,
         content = content,
         message_type = "text",
-        status = "sent"
+        status = "sent",
+        reply_to_message_id = reply_to_message_id
     )
 
     db.session.add(new_message)
@@ -495,7 +516,8 @@ def get_messages(chat_id):
                 "content":message.content,
                 "message_type":message.message_type,
                 "sent_at":message.sent_at,
-                "status":message.status
+                "status":message.status,
+                "reply_to_message_id":message.reply_to_message_id
             }
             for message in messages 
         ]

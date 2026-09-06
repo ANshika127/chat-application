@@ -556,6 +556,44 @@ def delete_message(message_id):
     },200
 
 
+@app.route("/messages/<int:message_id>",methods=["PUT"])
+@jwt_required()
+def edit_message(message_id):
+    current_user_id = int(get_jwt_identity())
+    
+    message= Messages.query.get(message_id)
+
+    if not message:
+        return{
+            "error":"Message Not Found"
+        },404
+
+    if message.sender_id != current_user_id:
+        return{
+            "error":"You can only edit your own message"
+        },403
+
+    data = request.get_json()
+
+    if not data:
+        return{
+            "error":"Request data is required"
+        },400
+
+    content= data.get("content","").strip()
+
+    if not content:
+        return{
+            "error":"Message content is requried"
+        },400
+
+    message.content= content
+
+    db.session.commit()
+
+    return{
+        "message":"Message updated successfully "
+    },200
 
 
 if __name__ == "__main__":

@@ -57,7 +57,7 @@ CREATE TABLE messages(
 
   FOREIGN KEY (sender_id)
     REFERENCES users(user_id)
-    ON DELETE CASCADE
+    ON DELETE CASCADE,
 
   FOREIGN KEY(reply_to_message_id)
     REFERENCES messages(message_id)

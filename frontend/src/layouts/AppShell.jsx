@@ -1,3 +1,4 @@
+import ChatSidebar from "../components/ChatSidebar";
 import NavigationRail from "../components/NavigationRail";
 import "./AppShell.css";
 
@@ -6,9 +7,7 @@ function AppShell() {
     <div className="app-shell">
       <NavigationRail/>
 
-      <aside className="chat-sidebar">
-        Chats
-      </aside>
+      <ChatSidebar/>
 
       <main className="chat-workspace">
         Chat Workspace

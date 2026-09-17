@@ -1,0 +1,25 @@
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--rail-width) var(--sidebar-width) 1fr;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--cream);
+}
+
+.navigation-rail {
+  width: var(--rail-width);
+  background: var(--olive);
+  color: var(--white);
+}
+
+.chat-sidebar {
+  width: var(--sidebar-width);
+  background: var(--parchment);
+  border-right: 1px solid var(--border);
+}
+
+.chat-workspace {
+  min-width: 0;
+  background: var(--cream);
+}

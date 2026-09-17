@@ -1,0 +1,110 @@
+:root {
+  /* =========================
+     ChatApp — Light Theme
+     ========================= */
+
+  /* Colors */
+  --cream: #F7F4EA;
+  --parchment: #EFEADA;
+  --parchment-dark: #E7E1CC;
+
+  --olive: #5B6B3F;
+  --olive-dark: #48542F;
+  --olive-tint: #DCE4C3;
+
+  --sage: #AEBD7E;
+
+  --ink: #3A3826;
+  --moss: #8A8570;
+
+  --border: #E3DCC6;
+
+  --white: #FFFEFB;
+
+  --danger: #B4573E;
+  --danger-tint: #F3E1DB;
+
+  --on-accent: #FFFEFB;
+  --on-accent-muted: rgba(255, 255, 255, 0.8);
+
+  /* =========================
+     Border Radius
+     ========================= */
+
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+
+  /* =========================
+     Shadows
+     ========================= */
+
+  --shadow-sm: 0 1px 2px rgba(58, 56, 38, 0.06);
+  --shadow-md: 0 4px 16px rgba(58, 56, 38, 0.08);
+
+  /* =========================
+     Overlay
+     ========================= */
+
+  --overlay: rgba(20, 18, 12, 0.45);
+
+  /* =========================
+     Layout
+     ========================= */
+
+  --rail-width: 76px;
+  --sidebar-width: 320px;
+
+  /* =========================
+     Typography
+     ========================= */
+
+  --font-family:
+    "Plus Jakarta Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  /* =========================
+     Transitions
+     ========================= */
+
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+}
+
+
+/* =========================
+   ChatApp — Dark Theme
+   ========================= */
+
+html[data-theme="dark"] {
+  --cream: #241F18;
+  --parchment: #1F1B14;
+  --parchment-dark: #191510;
+
+  --olive: #6B8449;
+  --olive-dark: #7E9A57;
+  --olive-tint: #333F26;
+
+  --sage: #A9BC7B;
+
+  --ink: #ECE7D8;
+  --moss: #9C9680;
+
+  --border: #3A352A;
+
+  --white: #2C2820;
+
+  --danger: #C9846A;
+  --danger-tint: #3A281F;
+
+  --on-accent: #F5F1E4;
+  --on-accent-muted: rgba(245, 241, 228, 0.75);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.5);
+
+  --overlay: rgba(0, 0, 0, 0.6);
+}

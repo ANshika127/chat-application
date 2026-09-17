@@ -1,0 +1,398 @@
+.chat-workspace {
+  min-width: 0;
+  height: 100vh;
+
+  background: var(--cream);
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================
+   Header
+   ========================= */
+
+.workspace-header {
+  height: 88px;
+
+  flex-shrink: 0;
+
+  padding: 0 28px;
+
+  border-bottom: 1px solid var(--border);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.workspace-user {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.workspace-avatar {
+  width: 52px;
+  height: 52px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #d27b56;
+  color: var(--white);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.workspace-user-info h2 {
+  margin: 0;
+
+  color: var(--ink);
+
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.workspace-user-info span {
+  display: block;
+
+  margin-top: 2px;
+
+  color: var(--moss);
+
+  font-size: 12px;
+}
+
+.workspace-menu {
+  width: 36px;
+  height: 36px;
+
+  border: none;
+  background: transparent;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+
+  cursor: pointer;
+}
+
+.workspace-menu span {
+  width: 4px;
+  height: 4px;
+
+  border-radius: 50%;
+
+  background: var(--moss);
+}
+
+/* =========================
+   Messages Area
+   ========================= */
+
+.messages-area {
+  flex: 1;
+
+  min-height: 0;
+
+  overflow-y: auto;
+
+  padding: 22px 34px 10px;
+}
+
+.date-divider {
+  display: flex;
+  justify-content: center;
+
+  margin-bottom: 22px;
+}
+
+.date-divider span {
+  padding: 5px 13px;
+
+  border-radius: var(--radius-pill);
+
+  background: var(--parchment-dark);
+
+  color: var(--moss);
+
+  font-size: 11px;
+}
+
+/* =========================
+   Message List
+   ========================= */
+
+.messages-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+}
+
+.message-row {
+  display: flex;
+  width: 100%;
+}
+
+.message-row.incoming {
+  justify-content: flex-start;
+}
+
+.message-row.outgoing {
+  justify-content: flex-end;
+}
+
+.message-group {
+  max-width: 55%;
+}
+
+/* =========================
+   Message Bubbles
+   ========================= */
+
+.message-bubble {
+  padding: 11px 15px;
+
+  border-radius: 15px;
+
+  font-size: 14px;
+  line-height: 1.4;
+
+  white-space: pre-line;
+}
+
+.incoming .message-bubble {
+  background: var(--white);
+  color: var(--ink);
+
+  border: 1px solid var(--border);
+
+  border-bottom-left-radius: 5px;
+}
+
+.outgoing .message-bubble {
+  background: var(--olive);
+  color: var(--white);
+
+  border-bottom-right-radius: 5px;
+}
+
+/* =========================
+   Reply Message
+   ========================= */
+
+.reply-bubble {
+  padding: 9px 13px;
+
+  background: var(--white);
+
+  border: 1px solid var(--border);
+
+  border-left: 3px solid var(--olive);
+
+  border-radius: 14px;
+
+  color: var(--ink);
+}
+
+.reply-author {
+  margin-bottom: 3px;
+
+  color: var(--olive);
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.reply-text {
+  font-size: 13px;
+
+  color: var(--moss);
+}
+
+/* =========================
+   Message Time
+   ========================= */
+
+.message-time {
+  margin-top: 5px;
+
+  color: var(--moss);
+
+  font-size: 10px;
+}
+
+.incoming .message-time {
+  text-align: left;
+}
+
+.outgoing .message-time {
+  text-align: right;
+}
+
+/* =========================
+   Composer
+   ========================= */
+
+.composer-area {
+  flex-shrink: 0;
+
+  padding: 18px 34px 20px;
+}
+
+.message-composer {
+  min-height: 62px;
+
+  padding: 8px 9px 8px 15px;
+
+  background: var(--white);
+
+  border: 1px solid var(--border);
+
+  border-radius: 32px;
+
+  box-shadow: var(--shadow-sm);
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.message-composer input {
+  flex: 1;
+  min-width: 0;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: var(--ink);
+
+  font-family: var(--font-family);
+  font-size: 14px;
+}
+
+.message-composer input::placeholder {
+  color: var(--moss);
+}
+
+/* =========================
+   Composer Buttons
+   ========================= */
+
+.composer-action {
+  width: 38px;
+  height: 38px;
+
+  flex-shrink: 0;
+
+  border: none;
+  background: transparent;
+
+  color: var(--moss);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  border-radius: 50%;
+}
+
+.composer-action:hover {
+  background: var(--parchment);
+  color: var(--olive);
+}
+
+.composer-action svg {
+  width: 20px;
+  height: 20px;
+}
+
+.send-button {
+  width: 44px;
+  height: 44px;
+
+  flex-shrink: 0;
+
+  border: none;
+  border-radius: 50%;
+
+  background: var(--olive);
+  color: var(--white);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition:
+    background var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.send-button:hover {
+  background: var(--olive-dark);
+  transform: translateY(-1px);
+}
+
+.send-button svg {
+  width: 19px;
+  height: 19px;
+}
+
+/* =========================
+   Responsive
+   ========================= */
+
+@media (max-width: 900px) {
+  .messages-area {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .composer-area {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .message-group {
+    max-width: 70%;
+  }
+}
+
+@media (max-width: 600px) {
+  .workspace-header {
+    height: 72px;
+    padding: 0 16px;
+  }
+
+  .workspace-avatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .messages-area {
+    padding: 18px 14px 8px;
+  }
+
+  .composer-area {
+    padding: 12px 12px 14px;
+  }
+
+  .message-group {
+    max-width: 82%;
+  }
+}

@@ -1,11 +1,10 @@
+import NavigationRail from "../components/NavigationRail";
 import "./AppShell.css";
 
 function AppShell() {
   return (
     <div className="app-shell">
-      <aside className="navigation-rail">
-        Navigation
-      </aside>
+      <NavigationRail/>
 
       <aside className="chat-sidebar">
         Chats

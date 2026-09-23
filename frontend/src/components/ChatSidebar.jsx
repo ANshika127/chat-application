@@ -1,4 +1,5 @@
 import "./ChatSidebar.css";
+import { MessageCircle, Search , Plus  } from "lucide-react";
 
 const chats = [
   {
@@ -64,14 +65,7 @@ function ChatSidebar() {
 
           <div className="chatapp-brand">
             <div className="chatapp-logo">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M5 5.5A3.5 3.5 0 0 1 8.5 2H16a3.5 3.5 0 0 1 3.5 3.5v6A3.5 3.5 0 0 1 16 15h-5.5L6 19v-4.5A3.5 3.5 0 0 1 2.5 11V5.5A3.5 3.5 0 0 1 5 5.5Z"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <MessageCircle size={20}/>
             </div>
 
             <h1>ChatApp</h1>
@@ -81,28 +75,14 @@ function ChatSidebar() {
             className="new-chat-button"
             aria-label="New chat"
           >
-            +
+            <Plus size={18}/>
           </button>
 
         </div>
 
         {/* Search */}
         <div className="search-box">
-          <svg viewBox="0 0 24 24" fill="none">
-            <circle
-              cx="11"
-              cy="11"
-              r="6.5"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            />
-            <path
-              d="m16 16 4.5 4.5"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            />
-          </svg>
+          <Search size={18}/>
 
           <input
             type="text"
@@ -123,9 +103,7 @@ function ChatSidebar() {
         {chats.map((chat) => (
           <button
             key={chat.id}
-            className={`chat-list-item ${
-              chat.active ? "active" : ""
-            }`}
+            className={`chat-list-item ${chat.active ? "active" : "" }`}
           >
 
             <div className={`chat-avatar ${chat.avatarColor}`}>

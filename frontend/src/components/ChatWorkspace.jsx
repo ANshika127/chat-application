@@ -1,5 +1,5 @@
 import "./ChatWorkspace.css";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Paperclip, Smile , Send, MoreVertical, MessageCircle } from "lucide-react";
 
 
@@ -10,6 +10,13 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
   );
 
   const [messageText , setMessageText] = useState("");
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  },[selectedChatData.messages, selectedChat]);
 
   const handleSend =() => {
     if (!messageText.trim()){ 
@@ -140,8 +147,10 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
               Say hello to {selectedChatData.name} to start the conversation.
             </p>
           </div>
-        )}
-         
+          )}
+
+          <div ref= {messagesEndRef}/>
+
         </div>
 
       </section>

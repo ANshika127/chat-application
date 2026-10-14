@@ -1,60 +1,9 @@
 import "./ChatSidebar.css";
 import { MessageCircle, Search , Plus  } from "lucide-react";
 
-const chats = [
-  {
-    id: 1,
-    name: "Abhay",
-    message: "Nice!",
-    time: "9:16 AM",
-    unread: 0,
-    avatar: "A",
-    avatarColor: "avatar-orange",
-    active: true,
-  },
-  {
-    id: 2,
-    name: "Jaini",
-    message: "See you tomorrow then",
-    time: "Yesterday",
-    unread: 2,
-    avatar: "J",
-    avatarColor: "avatar-blue",
-    active: false,
-  },
-  {
-    id: 3,
-    name: "Jasmine",
-    message: "No messages yet",
-    time: "",
-    unread: 0,
-    avatar: "J",
-    avatarColor: "avatar-purple",
-    active: false,
-  },
-  {
-    id: 4,
-    name: "Mom",
-    message: "Call me when free",
-    time: "Mon",
-    unread: 1,
-    avatar: "M",
-    avatarColor: "avatar-yellow",
-    active: false,
-  },
-  {
-    id: 5,
-    name: "Papa",
-    message: "OK, sounds good",
-    time: "Mon",
-    unread: 0,
-    avatar: "P",
-    avatarColor: "avatar-green",
-    active: false,
-  },
-];
 
-function ChatSidebar() {
+
+function ChatSidebar({ chats , selectedChat , setSelectedChat }) {
   return (
     <aside className="chat-sidebar">
 
@@ -103,7 +52,8 @@ function ChatSidebar() {
         {chats.map((chat) => (
           <button
             key={chat.id}
-            className={`chat-list-item ${chat.active ? "active" : "" }`}
+            className={`chat-list-item ${chat.id === selectedChat ? "active" : "" }`}
+            onClick={()=> setSelectedChat(chat.id)}
           >
 
             <div className={`chat-avatar ${chat.avatarColor}`}>

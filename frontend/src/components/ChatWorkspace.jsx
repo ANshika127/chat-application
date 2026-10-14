@@ -1,41 +1,48 @@
 import "./ChatWorkspace.css";
-import { Paperclip, Smile , Send, MoreVertical } from "lucide-react";
+import { useState } from "react";
+import { Paperclip, Smile , Send, MoreVertical, MessageCircle } from "lucide-react";
 
-const messages = [
-  {
-    id: 1,
-    type: "incoming",
-    content: "Hey! How are you?",
-    time: "9:14 AM",
-  },
-  {
-    id: 2,
-    type: "outgoing",
-    content: "I'm good! What about you?",
-    time: "9:15 AM",
-  },
-  {
-    id: 3,
-    type: "incoming",
-    content: "Doing well 😊",
-    time: "9:16 AM",
-  },
-  {
-    id: 4,
-    type: "incoming-reply",
-    replyTo: "Doing well 😊",
-    content: "Abhay\nDoing well 😊",
-    time: "9:16 AM",
-  },
-  {
-    id: 5,
-    type: "outgoing",
-    content: "Nice!",
-    time: "9:16 AM",
-  },
-];
 
-function ChatWorkspace() {
+function ChatWorkspace({ chats, selectedChat, setChatData }) {
+ 
+  const selectedChatData =chats.find(
+    (chat) => chat.id === selectedChat
+  );
+
+  const [messageText , setMessageText] = useState("");
+
+  const handleSend =() => {
+    if (!messageText.trim()){ 
+      return;
+    }
+
+    const newMessage = {
+      id: Date.now(),
+      type: "outgoing",
+      content: messageText.trim(),
+      time: new Date().toLocaleDateString([],{
+        hour:"2-digit",
+        minute:"2-digit"
+      }),
+    };
+
+    setChatData((previousChats)=>
+      previousChats.map((chat)=>
+        chat.id === selectedChat
+          ? {
+            ...chat,
+            message: newMessage.content,
+            time: newMessage.time,
+            messages: [...chat.messages, newMessage],
+            }
+          : chat
+      )
+    );
+
+    
+    setMessageText("");
+    };
+
   return (
     <main className="chat-workspace">
 
@@ -46,12 +53,12 @@ function ChatWorkspace() {
       <header className="workspace-header">
 
         <div className="workspace-user">
-          <div className="workspace-avatar">
-            A
+          <div className={`workspace-avatar ${selectedChatData.avatarColor}`}>
+            {selectedChatData.avatar}
           </div>
 
           <div className="workspace-user-info">
-            <h2>Abhay</h2>
+            <h2>{selectedChatData.name}</h2>
             <span>Conversation</span>
           </div>
         </div>
@@ -75,7 +82,8 @@ function ChatWorkspace() {
 
         <div className="messages-list">
 
-          {messages.map((message) => {
+        {selectedChatData.messages.length > 0 ? ( 
+          selectedChatData.messages.map((message) => {
             if (message.type === "incoming-reply") {
               return (
                 <div
@@ -86,11 +94,11 @@ function ChatWorkspace() {
 
                     <div className="reply-bubble">
                       <div className="reply-author">
-                        Abhay
+                        {message.replyAuthor}
                       </div>
 
                       <div className="reply-text">
-                        Doing well 😊
+                        {message.replyTo}
                       </div>
                     </div>
 
@@ -121,8 +129,19 @@ function ChatWorkspace() {
                 </div>
               </div>
             );
-          })}
-
+          })
+        ):(
+          <div className="empty-chat">
+            <div className ="empty-chat-icon">
+              <MessageCircle size={30} strokeWidth={1.8} />
+              </div>
+            <h3>No messages yet</h3>
+            <p>
+              Say hello to {selectedChatData.name} to start the conversation.
+            </p>
+          </div>
+        )}
+         
         </div>
 
       </section>
@@ -146,6 +165,14 @@ function ChatWorkspace() {
             type="text"
             placeholder="Type a message..."
             aria-label="Message"
+            value = {messageText}
+            onChange = {(event)=> setMessageText(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter"){
+                event.preventDefault();
+                handleSend();
+              }
+            }}
           />
 
           <button
@@ -158,6 +185,7 @@ function ChatWorkspace() {
           <button
             className="send-button"
             aria-label="Send message"
+            onClick={handleSend}
           >
             <Send size={19}/>
           </button>

@@ -1,7 +1,7 @@
 import "./ChatWorkspace.css";
 import EmojiPicker from "emoji-picker-react";
 import { useState, useRef, useEffect } from "react";
-import { Paperclip, Smile , Send, MoreVertical, MessageCircle } from "lucide-react";
+import { Paperclip, Smile , Send, MoreVertical, MessageCircle, MoveDownRight,Reply, Pencil,Trash2 } from "lucide-react";
 
 
 
@@ -14,8 +14,14 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
   const [messageText , setMessageText] = useState("");
   const[showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const[activeMessageMenu , setActiveMessageMenu] = useState(null);
+  const[replyingTo, setReplyingTo] = useState(null);
+  const[editingMessage, setEditingMessage] = useState(null);
+
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
+  const messageActionRefs = useRef({});
+
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
@@ -23,19 +29,78 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
     });
   },[selectedChatData.messages, selectedChat]);
 
+  
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (activeMessageMenu === null) return;
+
+      const openMenuElement =
+        messageActionRefs.current[activeMessageMenu];
+
+      if (
+        openMenuElement &&
+        !openMenuElement.contains(event.target)
+      ) {
+        setActiveMessageMenu(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [activeMessageMenu]);
+
+
+
   const handleSend =() => {
     if (!messageText.trim()){ 
       return;
     }
+    const trimmedText = messageText.trim();
 
+    if (editingMessage) {
+      setChatData((previousChats)=>
+        previousChats.map((chat) =>{
+          if (chat.id !== selectedChat){
+            return chat;
+          }
+          
+          const updatedMessages = chat.messages.map((message)=>
+            message.id === editingMessage.id ? {...message, content: trimmedText} : message
+          );
+
+          const latestMessage = updatedMessages[updatedMessages.length - 1];
+          return {
+            ...chat,
+            messages: updatedMessages,
+            message:latestMessage?.content ?? "",
+          };
+        })
+      );
+      setEditingMessage(null);
+      setMessageText("");
+      return;
+    }
+
+//Normal send message
     const newMessage = {
       id: Date.now(),
       type: "outgoing",
-      content: messageText.trim(),
+      content: trimmedText,
       time: new Date().toLocaleDateString([],{
         hour:"2-digit",
         minute:"2-digit"
       }),
+      replyTo: replyingTo 
+        ? {
+            id: replyingTo.id,
+            content: replyingTo.content,
+            author:
+              replyingTo.type === "outgoing" ? "You" : selectedChatData.name,
+        }
+        :null,
     };
 
     setChatData((previousChats)=>
@@ -51,9 +116,9 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
       )
     );
 
-    
     setMessageText("");
-    };
+    setReplyingTo(null);
+  };
 
   return (
     <main className="chat-workspace">
@@ -124,16 +189,108 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
             }
 
             return (
-              <div
-                className={`message-row ${message.type}`}
+              <div className={`message-row ${message.type}`}
                 key={message.id}
               >
                 <div className="message-group">
 
                   <div className="message-bubble">
-                    {message.content}
+                    {message.replyTo && (
+                      <div className="message-reply-quote">
+                        <div className="message-reply-author">
+                          {message.replyTo.content}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="message-content">
+                      {message.content}
+                    </div>
                   </div>
 
+                  <div
+                    className="message-actions-wrapper"
+                    ref={(element) => {
+                      if (element) {
+                        messageActionRefs.current[message.id] = element;
+                      } else {
+                        delete messageActionRefs.current[message.id];
+                      }
+                    }}
+                  >
+                    <button
+                      type="button"
+                      className="message-menu-trigger"
+                      aria-label="Message actions"
+                      onClick={()=>
+                        setActiveMessageMenu(
+                          activeMessageMenu === message.id? null : message.id
+                        )
+                      }
+                    >
+                      <MoreVertical size ={16}/>
+                    </button>
+
+              
+                    {activeMessageMenu === message.id && (
+                      <div className="message-actions-menu">
+                        <button
+                          onClick={()=>{
+                            setReplyingTo(message);
+                            setActiveMessageMenu(null);
+                          }}
+                        >
+                          Reply
+                        </button>
+
+                        {message.type === "outgoing" &&(
+                          <>
+                          <button
+                            type="button"
+                            onClick={()=>{
+                              setEditingMessage(message);
+                              setMessageText(message.content);
+                              setActiveMessageMenu(null);
+                            }}
+                          >
+                            <Pencil size={15} />
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={()=>{
+                              setChatData((previousChats)=>
+                                previousChats.map((chat)=>{
+                                  if (chat.id !== selectedChat){
+                                    return chat;
+                                  }
+                                  const updatedMessages = chat.messages.filter(
+                                    (item) => item.id !== message.id
+                                  );
+                                  const latestMessage = updatedMessages[updatedMessages.length-1];
+                                  return{
+                                    ...chat,
+                                    messages: updatedMessages,
+                                    message: latestMessage?.content ?? "No messages yet",
+                                    time: latestMessage?.time ?? "",
+                                  };
+                                })
+                              );
+                              setActiveMessageMenu(null);
+                            }}
+
+                            >
+                              <Trash2 size={15}/>
+                              Delete
+                          </button>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  
                   <div className="message-time">
                     {message.time}
                   </div>
@@ -212,6 +369,29 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
           </div>
         )}
 
+        {replyingTo && (
+          <div className="reply-preview">
+            <div className="reply-preview-content">
+              <span className="reply-preview-label">
+                Replying to {replyingTo.type === "outgoing" ? "ypurself" : "message"}
+              </span>
+
+              <span className="reply-preview-text">
+                {replyingTo.content}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              className="reply-preview-cancel"
+              aria-label="Cancel reply"
+              onClick={()=> setReplyingTo(null)}
+            >
+              x
+            </button>
+          </div>
+        )}
+
         {showEmojiPicker && (
           <div className="emoji-picker-container">
             <EmojiPicker
@@ -220,6 +400,37 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
                 setShowEmojiPicker(false);
               }}
             />
+          </div>
+        )}
+
+
+        {editingMessage && (
+          <div className="editing-message-banner">
+            <div className="editing-message-info">
+              <Pencil size={17}/>
+              <div className="editing-message-text">
+                <span className="editing-message-title">
+                  Editing Message
+                </span>
+
+                <span className="editing-message-preview">
+                  {editingMessage.content}
+                </span>
+
+              </div>
+            </div>
+
+            <button 
+              type="button"
+              className="cancel-edit-button"
+              aria-label="Cancel editing"
+              onClick={()=>{
+                setEditingMessage(null);
+                setMessageText("");
+              }}
+            >
+              x
+            </button>
           </div>
         )}
 

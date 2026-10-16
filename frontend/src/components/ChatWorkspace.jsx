@@ -1,6 +1,8 @@
 import "./ChatWorkspace.css";
+import EmojiPicker from "emoji-picker-react";
 import { useState, useRef, useEffect } from "react";
 import { Paperclip, Smile , Send, MoreVertical, MessageCircle } from "lucide-react";
+
 
 
 function ChatWorkspace({ chats, selectedChat, setChatData }) {
@@ -10,7 +12,10 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
   );
 
   const [messageText , setMessageText] = useState("");
+  const[showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
@@ -161,11 +166,69 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
 
       <div className="composer-area">
 
+        <input 
+          ref={fileInputRef}
+          type = "file"
+          hidden
+          onChange={(event)=>{
+            const file = event.target.files?.[0];
+
+            if (file){
+              setSelectedFile(file);
+            }
+          }}
+        />
+
+        {selectedFile && (
+          <div className="selected-file">
+            <div className="selected-file-icon">
+              <Paperclip size={22}/>
+            </div>
+
+            <div className="selected-file-info">
+              <span className="selected-file-name">
+                {selectedFile.name}
+              </span>
+
+              <span className="selected-file-label">
+                Attachment ready
+              </span>
+            </div>
+
+            <button
+              type="button"
+              className="remove-attachment"
+              aria-label="Remove attachment"
+              onClick={()=>{
+                setSelectedFile(null);
+
+                if (fileInputRef.current) {
+                  fileInputRef.current.value="";
+                }
+              }}
+            >
+              x
+            </button>
+          </div>
+        )}
+
+        {showEmojiPicker && (
+          <div className="emoji-picker-container">
+            <EmojiPicker
+              onEmojiClick={(emojiData)=>{
+                setMessageText((previous)=> previous + emojiData.emoji);
+                setShowEmojiPicker(false);
+              }}
+            />
+          </div>
+        )}
+
         <div className="message-composer">
 
           <button
             className="composer-action"
             aria-label="Attach file"
+            onClick={()=> fileInputRef.current?.click()}
           >
             <Paperclip size={20}/>
           </button>
@@ -185,8 +248,10 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
           />
 
           <button
+            type ="button"
             className="composer-action"
             aria-label="Emoji"
+            onClick={()=> setShowEmojiPicker((previous) => !previous)}
           >
             <Smile size={20}/>
           </button>

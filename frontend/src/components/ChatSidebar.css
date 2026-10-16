@@ -137,6 +137,22 @@
   color: var(--moss);
 }
 
+.search-box:focus-within {
+  border-color: var(--olive);
+  box-shadow: 0 0 0 2px var(--olive-tint);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+
+.no-search-results {
+  padding: 24px 12px;
+  color: var(--moss);
+  font-size: 13px;
+  text-align: center;
+}
+
 /* =========================
    Chat List
    ========================= */

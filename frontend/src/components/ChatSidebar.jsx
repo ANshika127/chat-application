@@ -1,9 +1,21 @@
 import "./ChatSidebar.css";
 import { MessageCircle, Search , Plus  } from "lucide-react";
-
+import { useState } from "react";
 
 
 function ChatSidebar({ chats , selectedChat , setSelectedChat }) {
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredChats = chats.filter((chat)=>{
+    const query = searchQuery.toLowerCase().trim();
+
+    return (
+      chat.name.toLowerCase().includes(query) || 
+      (chat.message || "").toLowerCase().includes(query)
+    );
+  });
+
   return (
     <aside className="chat-sidebar">
 
@@ -37,6 +49,8 @@ function ChatSidebar({ chats , selectedChat , setSelectedChat }) {
             type="text"
             placeholder="Search conversations"
             aria-label="Search conversations"
+            value={searchQuery}
+            onChange={(event)=> setSearchQuery(event.target.value)}
           />
         </div>
 
@@ -49,49 +63,56 @@ function ChatSidebar({ chats , selectedChat , setSelectedChat }) {
           Chats
         </div>
 
-        {chats.map((chat) => (
-          <button
-            key={chat.id}
-            className={`chat-list-item ${chat.id === selectedChat ? "active" : "" }`}
-            onClick={()=> setSelectedChat(chat.id)}
-          >
+        {filteredChats.length > 0 ? (
+          filteredChats.map((chat) => (
+            <button
+              key={chat.id}
+              className={`chat-list-item ${chat.id === selectedChat ? "active" : "" }`}
+              onClick={()=> setSelectedChat(chat.id)}
+            >
 
-            <div className={`chat-avatar ${chat.avatarColor}`}>
-              {chat.avatar}
-            </div>
-
-            <div className="chat-preview">
-
-              <div className="chat-name-row">
-                <span className="chat-name">
-                  {chat.name}
-                </span>
-
-                {chat.time && (
-                  <span className="chat-time">
-                    {chat.time}
-                  </span>
-                )}
+              <div className={`chat-avatar ${chat.avatarColor}`}>
+                {chat.avatar}
               </div>
 
-              <div className="chat-message-row">
+              <div className="chat-preview">
 
-                <span className="last-message">
-                  {chat.message}
-                </span>
-
-                {chat.unread > 0 && (
-                  <span className="unread-badge">
-                    {chat.unread}
+                <div className="chat-name-row">
+                  <span className="chat-name">
+                    {chat.name}
                   </span>
-                )}
+
+                  {chat.time && (
+                    <span className="chat-time">
+                      {chat.time}
+                    </span>
+                  )}
+                </div>
+
+                <div className="chat-message-row">
+
+                  <span className="last-message">
+                    {chat.message}
+                  </span>
+
+                  {chat.unread > 0 && (
+                    <span className="unread-badge">
+                      {chat.unread}
+                    </span>
+                  )}
+
+                </div>
 
               </div>
 
-            </div>
+            </button>
+          ))
+        ) : (
+          <div className="no-search-results">
+            No conversations found
+          </div>
+        )}
 
-          </button>
-        ))}
 
       </div>
 

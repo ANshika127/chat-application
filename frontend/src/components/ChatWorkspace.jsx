@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import { Paperclip, Smile , Send, MoreVertical, MessageCircle, MoveDownRight,Reply, Pencil,Trash2 } from "lucide-react";
 
 
-
 function ChatWorkspace({ chats, selectedChat, setChatData }) {
  
   const selectedChatData =chats.find(

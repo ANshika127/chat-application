@@ -3,6 +3,7 @@ import { useState } from "react";
 import ChatSidebar from "../components/ChatSidebar";
 import ChatWorkspace from "../components/ChatWorkspace";
 import NavigationRail from "../components/NavigationRail";
+import Profile from "../components/Profile";
 
 import "./AppShell.css";
 
@@ -116,6 +117,7 @@ const chats = [
 function AppShell() {
   const [ selectedChat, setSelectedChat] = useState(1);
   const [chatData, setChatData]= useState(chats);
+  const [activeView, setActiveView] =useState("chats");
 
   const handleSelectedChat = (chatId) =>{
     setSelectedChat(chatId);
@@ -128,21 +130,29 @@ function AppShell() {
   }
 
   return (
-    <div className="app-shell">
-      <NavigationRail/>
-
-      <ChatSidebar
-        chats={chatData}
-        selectedChat={selectedChat}
-        setSelectedChat={handleSelectedChat}
+    <div className={`app-shell ${activeView === "profile" ? "profile-active" : ""}`}>
+      <NavigationRail
+        activeView={activeView}
+        setActiveView={setActiveView}
       />
 
-      <ChatWorkspace
-        chats={chatData}
-        selectedChat={selectedChat}
-        setChatData={setChatData}
-      />
+      {activeView === "profile" ? (
+        <Profile/>
+      ) : (
+        <>
+          <ChatSidebar
+            chats={chatData}
+            selectedChat={selectedChat}
+            setSelectedChat={handleSelectedChat}
+          />
 
+          <ChatWorkspace
+            chats={chatData}
+            selectedChat={selectedChat}
+            setChatData={setChatData}
+          />
+        </>
+      )}
     </div>
   );
 }

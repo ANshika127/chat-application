@@ -1,0 +1,87 @@
+
+.confirmation-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: var(--overlay, rgba(20, 18, 12, 0.45));
+}
+
+.confirmation-dialog {
+  width: 100%;
+  max-width: 370px;
+  padding: 22px;
+  background: var(--white, #FFFEFB);
+  border: 1px solid var(--border, #E3DCC6);
+  border-radius: var(--radius-lg, 20px);
+  box-shadow: var(--shadow-md, 0 4px 16px rgba(58, 56, 38, 0.08));
+  color: var(--ink, #3A3826);
+}
+
+.confirmation-dialog h2 {
+  margin: 0 0 6px;
+  font-family: var(--font-family, inherit);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.confirmation-dialog p {
+  margin: 0;
+  color: var(--moss, #8A8570);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.confirmation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.confirmation-actions button {
+  min-height: 38px;
+  padding: 0 15px;
+  border: 1px solid var(--border, #E3DCC6);
+  border-radius: var(--radius-sm, 10px);
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background var(--transition-fast, 150ms ease);
+}
+
+.confirmation-cancel {
+  color: var(--ink, #3A3826);
+}
+
+.confirmation-cancel:hover {
+  background: var(--parchment, #EFEADA);
+}
+
+.confirmation-confirm {
+  color: var(--ink, #3A3826);
+}
+
+.confirmation-confirm:hover {
+  background: var(--parchment, #EFEADA);
+}
+
+.confirmation-confirm.confirmation-danger {
+  color: var(--danger, #B4573E);
+}
+
+.confirmation-confirm.confirmation-danger:hover {
+  background: var(--danger-tint, #F3E1DB);
+}
+
+@media (max-width: 480px) {
+  .confirmation-dialog {
+    max-width: 100%;
+    padding: 20px;
+  }
+}

@@ -1,0 +1,128 @@
+.profile-page {
+  flex: 1;
+  min-width: 0;
+  min-height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 45px 32px;
+  background: var(--cream);
+  overflow-y: auto;
+}
+
+.profile-card {
+  width: 100%;
+  max-width: 446px;
+  box-sizing: border-box;
+  padding: 30px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 25px;
+}
+
+.profile-avatar {
+  width: 62px;
+  height: 62px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #cbb77e, var(--sage));
+}
+
+.profile-identity h2 {
+  margin: 0 0 4px;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.profile-identity p {
+  margin: 0;
+  color: var(--moss);
+  font-size: 12px;
+}
+
+.profile-details {
+  width: 100%;
+}
+
+.profile-detail-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.profile-detail-row:last-child {
+  border-bottom: none;
+}
+
+.profile-detail-row span:first-child {
+  flex-shrink: 0;
+  color: var(--moss);
+}
+
+.profile-detail-row span:last-child {
+  color: var(--ink);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.profile-button {
+  flex: 1;
+  min-width: 0;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.profile-button:hover {
+  background: var(--parchment);
+}
+
+.logout {
+  color: var(--danger);
+}
+
+.logout:hover {
+  background: var(--danger-tint);
+}
+
+@media (max-width: 520px) {
+  .profile-page {
+    padding: 28px 16px;
+  }
+
+  .profile-card {
+    max-width: 446px;
+    padding: 22px;
+  }
+}

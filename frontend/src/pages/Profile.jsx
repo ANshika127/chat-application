@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { Pencil , LogOut } from "lucide-react";
 import EditProfile from "./EditProfile";
-import ConfirmationDialog from "./ConfirmationDialog";
+import ConfirmationDialog from "../components/ConfirmationDialog";
 import "./Profile.css";
 
 

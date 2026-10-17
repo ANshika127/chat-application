@@ -34,3 +34,13 @@
   width: 100%;
   box-sizing: border-box;
 }
+
+.app-shell.settings-active {
+  grid-template-columns: var(--rail-width) minmax(0, 1fr);
+}
+
+.app-shell.settings-active .settings-page {
+  grid-column: 2;
+  width: 100%;
+  box-sizing: border-box;
+}

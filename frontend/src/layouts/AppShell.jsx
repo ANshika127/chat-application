@@ -3,7 +3,8 @@ import { useState } from "react";
 import ChatSidebar from "../components/ChatSidebar";
 import ChatWorkspace from "../components/ChatWorkspace";
 import NavigationRail from "../components/NavigationRail";
-import Profile from "../components/Profile";
+import Profile from "../pages/Profile";
+import SettingsPage from "../pages/Settings"
 
 import "./AppShell.css";
 
@@ -130,7 +131,15 @@ function AppShell() {
   }
 
   return (
-    <div className={`app-shell ${activeView === "profile" ? "profile-active" : ""}`}>
+    <div 
+      className={`app-shell ${
+        activeView === "profile" 
+        ? "profile-active"
+         : activeView === "settings"
+         ? "settings-active" 
+         : ""
+        }`}
+      >
       <NavigationRail
         activeView={activeView}
         setActiveView={setActiveView}
@@ -138,6 +147,8 @@ function AppShell() {
 
       {activeView === "profile" ? (
         <Profile/>
+      ) : activeView === "settings" ? (
+        <SettingsPage onOpenProfile={()=> setActiveView("profile")}/>  
       ) : (
         <>
           <ChatSidebar

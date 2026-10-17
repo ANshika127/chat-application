@@ -48,8 +48,9 @@ function NavigationRail({ activeView , setActiveView}) {
         </button>
 
         <button 
-          className="rail-icon" 
+          className={`rail-icon ${activeView === "settings" ? "active" : ""}`}
           aria-label="Settings"
+          onClick={()=> setActiveView("settings")}
         >
           <Settings size={22}/>
         </button>

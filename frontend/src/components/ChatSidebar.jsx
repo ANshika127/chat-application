@@ -1,11 +1,12 @@
-import "./ChatSidebar.css";
-import { MessageCircle, Search , Plus  } from "lucide-react";
 import { useState } from "react";
+import { MessageCircle, Search , Plus  } from "lucide-react";
+import NewChatModal from "./NewChatModal";
+import "./ChatSidebar.css";
 
-
-function ChatSidebar({ chats , selectedChat , setSelectedChat }) {
+function ChatSidebar({ chats , selectedChat , setSelectedChat, onNewChat }) {
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [isNewChatOpen, setIsNewChatOpen] = useState(false);
 
   const filteredChats = chats.filter((chat)=>{
     const query = searchQuery.toLowerCase().trim();
@@ -35,6 +36,7 @@ function ChatSidebar({ chats , selectedChat , setSelectedChat }) {
           <button
             className="new-chat-button"
             aria-label="New chat"
+            onClick= {() => setIsNewChatOpen(true)}
           >
             <Plus size={18}/>
           </button>
@@ -112,10 +114,18 @@ function ChatSidebar({ chats , selectedChat , setSelectedChat }) {
             No conversations found
           </div>
         )}
-
-
       </div>
 
+      {isNewChatOpen && (
+        <NewChatModal
+        onClose ={()=> setIsNewChatOpen(false)}
+        onSelectContact={(contact)=>{
+          onNewChat(contact);
+          setIsNewChatOpen(false);
+        }}
+        />
+      )}
+      
     </aside>
   );
 }

@@ -9,6 +9,7 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 
 import "./AppShell.css";
+import { Contact } from "lucide-react";
 
 const chats = [
   {
@@ -135,6 +136,38 @@ function AppShell() {
     );
   }
 
+  const handleNewChat = (contact) =>{
+    const existingChat = chatData.find(
+      (chat)=>
+        chat.contactId === contact.id ||
+      chat.name === contact.name
+    );
+
+    if(existingChat){
+      handleSelectedChat(existingChat.id);
+      return;
+    }
+
+    const newChat = {
+      id: Date.now(),
+      contactId: contact.id,
+      name: contact.name,
+      message: "No messages yet",
+      time: "",
+      unread: 0,
+      avatar: contact.avatar,
+      avatarColor: contact.color,
+      messages: [],
+    };
+
+    setChatData((previousChats)=>[
+      newChat,
+      ...previousChats,
+    ]);
+
+    setSelectedChat(newChat.id);
+  };
+
   const handleLogin = ()=>{
     setIsAuthenticated(true);
     setActiveView("chats");
@@ -199,6 +232,7 @@ function AppShell() {
                   chats={chatData}
                   selectedChat={selectedChat}
                   setSelectedChat={handleSelectedChat}
+                  onNewChat={handleNewChat}
                 />
 
                 <ChatWorkspace

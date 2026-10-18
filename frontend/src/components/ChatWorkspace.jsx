@@ -28,7 +28,7 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
     messagesEndRef.current?.scrollIntoView({
       behavior: "smooth",
     });
-  },[selectedChatData.messages, selectedChat]);
+  },[selectedChatData?.messages, selectedChat]);
 
   
   useEffect(() => {
@@ -138,8 +138,11 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
   return (
     <main className="chat-workspace">
       <div className="empty-chat">
+        <div className="empty-chat-icon">
+          <MessageCircle size={30} strokeWidth={1.8} />
+        </div>
         <h3>Select a conversation</h3>
-        <p>Choose a chat to start messaging.</p>
+        <p>Choose a chat from the sidebar to start messaging.</p>
       </div>
     </main>
   );

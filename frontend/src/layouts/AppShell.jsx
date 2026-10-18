@@ -119,15 +119,16 @@ const chats = [
 
 
 function AppShell() {
-  const [ selectedChat, setSelectedChat] = useState(1);
+  const [ selectedChat, setSelectedChat] = useState(null);
   const [chatData, setChatData]= useState(chats);
-  const [activeView, setActiveView] =useState("chats");
+  const [activeView, setActiveView] =useState("home");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authView, setAuthView] = useState("login");
 
 
   const handleSelectedChat = (chatId) =>{
     setSelectedChat(chatId);
+    setActiveView("chats");
 
     setChatData((previousChats)=>
       previousChats.map((chat)=>
@@ -170,7 +171,8 @@ function AppShell() {
 
   const handleLogin = ()=>{
     setIsAuthenticated(true);
-    setActiveView("chats");
+    setSelectedChat(null);
+    setActiveView("home");
   };
 
   const handleRegister = (userData) =>{
@@ -217,6 +219,10 @@ function AppShell() {
               activeView={activeView}
               setActiveView={setActiveView}
               onLogout={handleLogout}
+              onHomeClick={()=> {
+                setSelectedChat(null);
+                setActiveView("home");
+              }}
             />
 
             {activeView === "profile" ? (

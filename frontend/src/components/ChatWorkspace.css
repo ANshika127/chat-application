@@ -431,41 +431,38 @@
    ========================= */
 
 .empty-chat {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 20px;
-  transform: translateY(110px);
+  height: 100%;
+  width: 100%;
 }
 
 .empty-chat-icon {
-  width: 72px;
-  height: 72px;
-  margin-bottom: 14px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  background: var(--parchment);
-  color: var(--olive);
+  background: var(--surface-secondary, #eeead9);
+  color: var(--olive, #596b3e);
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  margin-bottom: 16px;
 }
 
 .empty-chat h3 {
-  margin: 0;
-  color: var(--ink);
-  font-size: 18px;
-  font-weight: 600;
+  margin: 0 0 8px;
 }
 
 .empty-chat p {
-  max-width: 250px;
-  margin: 5px 0 0;
-  color: var(--moss);
-  font-size: 13px;
-  line-height: 1.45;
+  margin: 0;
+  max-width: 280px;
+  line-height: 1.5;
+  color: var(--text-muted, #858276);
 }
 
 .emoji-picker-container {

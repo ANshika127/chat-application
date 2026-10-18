@@ -3,13 +3,13 @@ import "./NavigationRail.css";
 import { Home , MessageCircle, Bell, Settings , LogOut } from "lucide-react";
 import ConfirmationDialog from "./ConfirmationDialog";
 
-function NavigationRail({ activeView , setActiveView, onLogout }) {
+function NavigationRail({ activeView , setActiveView, onLogout, onHomeClick }) {
 
   const [ showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const handleLogoutCancel = () => {
     setShowLogoutDialog(false);
-    
+
   };
 
   return (
@@ -26,9 +26,10 @@ function NavigationRail({ activeView , setActiveView, onLogout }) {
       {/* Main Navigation */}
       <nav className="rail-navigation">
         <button 
-          className="rail-icon" 
+          className={`rail-icon ${activeView === "home" ? "active" : ""}`}
           aria-label="Home"
-          onClick={()=> setActiveView("chats")}
+          onClick={onHomeClick}
+          
         >
           <Home size={22}/>
         </button>
@@ -39,13 +40,6 @@ function NavigationRail({ activeView , setActiveView, onLogout }) {
           onClick={()=> setActiveView("chats")}
         >
           <MessageCircle size={22}/>
-        </button>
-
-        <button 
-          className="rail-icon" 
-          aria-label="Notifications"
-        >
-          <Bell size={22}/>
         </button>
 
         <button 

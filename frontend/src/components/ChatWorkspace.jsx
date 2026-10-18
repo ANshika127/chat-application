@@ -1,7 +1,8 @@
-import "./ChatWorkspace.css";
-import EmojiPicker from "emoji-picker-react";
 import { useState, useRef, useEffect } from "react";
 import { Paperclip, Smile , Send, MoreVertical, MessageCircle, MoveDownRight,Reply, Pencil,Trash2 } from "lucide-react";
+import EmojiPicker from "emoji-picker-react";
+import ConfirmationDialog from "./ConfirmationDialog";
+import "./ChatWorkspace.css";
 
 
 function ChatWorkspace({ chats, selectedChat, setChatData }) {
@@ -16,6 +17,7 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
   const[activeMessageMenu , setActiveMessageMenu] = useState(null);
   const[replyingTo, setReplyingTo] = useState(null);
   const[editingMessage, setEditingMessage] = useState(null);
+  const[messageToDelete, setMessageToDelete] = useState(null);
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -51,6 +53,19 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
     };
   }, [activeMessageMenu]);
 
+  
+  useEffect(() => {
+    setMessageText("");
+    setReplyingTo(null);
+    setEditingMessage(null);
+    setSelectedFile(null);
+    setShowEmojiPicker(false);
+    setActiveMessageMenu(null);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }, [selectedChat]);
 
 
   const handleSend =() => {
@@ -88,7 +103,7 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
       id: Date.now(),
       type: "outgoing",
       content: trimmedText,
-      time: new Date().toLocaleDateString([],{
+      time: new Date().toLocaleTimeString([],{
         hour:"2-digit",
         minute:"2-digit"
       }),
@@ -118,6 +133,17 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
     setMessageText("");
     setReplyingTo(null);
   };
+
+  if (!selectedChatData) {
+  return (
+    <main className="chat-workspace">
+      <div className="empty-chat">
+        <h3>Select a conversation</h3>
+        <p>Choose a chat to start messaging.</p>
+      </div>
+    </main>
+  );
+}
 
   return (
     <main className="chat-workspace">
@@ -259,26 +285,9 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
                           <button
                             type="button"
                             onClick={()=>{
-                              setChatData((previousChats)=>
-                                previousChats.map((chat)=>{
-                                  if (chat.id !== selectedChat){
-                                    return chat;
-                                  }
-                                  const updatedMessages = chat.messages.filter(
-                                    (item) => item.id !== message.id
-                                  );
-                                  const latestMessage = updatedMessages[updatedMessages.length-1];
-                                  return{
-                                    ...chat,
-                                    messages: updatedMessages,
-                                    message: latestMessage?.content ?? "No messages yet",
-                                    time: latestMessage?.time ?? "",
-                                  };
-                                })
-                              );
+                              setMessageToDelete(message);
                               setActiveMessageMenu(null);
                             }}
-
                             >
                               <Trash2 size={15}/>
                               Delete
@@ -372,7 +381,7 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
           <div className="reply-preview">
             <div className="reply-preview-content">
               <span className="reply-preview-label">
-                Replying to {replyingTo.type === "outgoing" ? "ypurself" : "message"}
+                Replying to {replyingTo.type === "outgoing" ? "yourself" : selectedChatData.name}
               </span>
 
               <span className="reply-preview-text">
@@ -473,11 +482,52 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
           >
             <Send size={19}/>
           </button>
-
         </div>
-
       </div>
+        {messageToDelete && (
+          <ConfirmationDialog
+            title="Delete message?"
+            description="Are you sure you want to delete this message? This action cannot be undone."
+            confirmLabel="Delete"
+            cancelLabel="Cancel"
+            danger={true}
+            onCancel={() => setMessageToDelete(null)}
+            onConfirm={() => {
+              const messageId = messageToDelete.id;
 
+              setChatData((previousChats) =>
+                previousChats.map((chat) => {
+                  if (chat.id !== selectedChat) return chat;
+
+                  const updatedMessages = chat.messages.filter(
+                    (item) => item.id !== messageId
+                  );
+
+                  const latestMessage =
+                    updatedMessages[updatedMessages.length - 1];
+
+                  return {
+                    ...chat,
+                    messages: updatedMessages,
+                    message: latestMessage?.content ?? "No messages yet",
+                    time: latestMessage?.time ?? "",
+                  };
+                })
+              );
+
+              if (editingMessage?.id === messageId) {
+                setEditingMessage(null);
+                setMessageText("");
+              }
+
+              if (replyingTo?.id === messageId) {
+                setReplyingTo(null);
+              }
+
+              setMessageToDelete(null);
+            }}
+          />
+      )}
     </main>
   );
 }

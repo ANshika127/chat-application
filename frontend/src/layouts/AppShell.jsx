@@ -5,6 +5,8 @@ import ChatWorkspace from "../components/ChatWorkspace";
 import NavigationRail from "../components/NavigationRail";
 import Profile from "../pages/Profile";
 import SettingsPage from "../pages/Settings"
+import Login from "../pages/Login";
+import Register from "../pages/Register";
 
 import "./AppShell.css";
 
@@ -119,6 +121,9 @@ function AppShell() {
   const [ selectedChat, setSelectedChat] = useState(1);
   const [chatData, setChatData]= useState(chats);
   const [activeView, setActiveView] =useState("chats");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authView, setAuthView] = useState("login");
+
 
   const handleSelectedChat = (chatId) =>{
     setSelectedChat(chatId);
@@ -130,41 +135,82 @@ function AppShell() {
     );
   }
 
+  const handleLogin = ()=>{
+    setIsAuthenticated(true);
+    setActiveView("chats");
+  };
+
+  const handleRegister = (userData) =>{
+    console.log("Reg form submitted", {
+      ...userData,
+      password:"[hidden]",
+    });
+
+    setIsAuthenticated(true);
+    setActiveView("chats");
+  };
+
+  const handleLogout= () =>{
+    setIsAuthenticated(false);
+    setAuthView("login");
+    setActiveView("chats");
+  };
+
   return (
-    <div 
-      className={`app-shell ${
-        activeView === "profile" 
-        ? "profile-active"
-         : activeView === "settings"
-         ? "settings-active" 
-         : ""
-        }`}
-      >
-      <NavigationRail
-        activeView={activeView}
-        setActiveView={setActiveView}
-      />
-
-      {activeView === "profile" ? (
-        <Profile/>
-      ) : activeView === "settings" ? (
-        <SettingsPage onOpenProfile={()=> setActiveView("profile")}/>  
+    <>
+      {!isAuthenticated ? (
+        authView === "register" ? (
+          <Register
+            onRegister={handleRegister}
+            onOpenLogin={() => setAuthView("login")}
+          />
+        ): (
+          <Login
+            onLogin={handleLogin}
+            onOpenRegister={() => setAuthView("register")}
+          />
+        )
       ) : (
-        <>
-          <ChatSidebar
-            chats={chatData}
-            selectedChat={selectedChat}
-            setSelectedChat={handleSelectedChat}
-          />
+        <div 
+          className={`app-shell ${
+            activeView === "profile" 
+              ? "profile-active"
+              : activeView === "settings"
+                ? "settings-active" 
+                : ""
+            }`}
+          >
+            <NavigationRail
+              activeView={activeView}
+              setActiveView={setActiveView}
+              onLogout={handleLogout}
+            />
 
-          <ChatWorkspace
-            chats={chatData}
-            selectedChat={selectedChat}
-            setChatData={setChatData}
-          />
-        </>
-      )}
-    </div>
+            {activeView === "profile" ? (
+              <Profile onLogout ={handleLogout} />
+            ) : activeView === "settings" ? (
+              <SettingsPage 
+                onOpenProfile={()=> setActiveView("profile")}
+                onLogout={handleLogout}
+              />  
+            ) : (
+              <>
+                <ChatSidebar
+                  chats={chatData}
+                  selectedChat={selectedChat}
+                  setSelectedChat={handleSelectedChat}
+                />
+
+                <ChatWorkspace
+                  chats={chatData}
+                  selectedChat={selectedChat}
+                  setChatData={setChatData}
+                />
+              </>
+            )}
+          </div>
+      )}    
+    </>   
   );
 }
 

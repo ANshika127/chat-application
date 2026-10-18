@@ -3,7 +3,7 @@ import { UserRound, ChevronRight, Sun, Moon,Bell, Volume2, Shield, LogOut } from
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import "./Settings.css";
 
-function Settings({ onOpenProfile }){
+function Settings({ onOpenProfile, onLogout }){
   const[ theme, setTheme] = useState("light");
   const[messageNotifications, setMessageNotifications] = useState(true);
   const[soundEnabled, setSoundEnabled] = useState(true);
@@ -15,7 +15,8 @@ function Settings({ onOpenProfile }){
 
   const handleLogoutConfirm = () =>{
     setShowLogoutDialog(false);
-    alert("Logout will be connected during api integration");
+    onLogout();
+    
   };
 
   return (
@@ -166,7 +167,9 @@ function Settings({ onOpenProfile }){
           <button
             type="button"
             className="settings-logout-button"
-            onClick={() => setShowLogoutDialog(true)}
+            onClick={() => {
+              setShowLogoutDialog(true);
+            }}
           >
             <LogOut size={18} />
             Log out

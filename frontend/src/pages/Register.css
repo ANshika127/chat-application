@@ -1,0 +1,61 @@
+
+.register-card {
+  max-width: 345px;
+  padding: 27px 29px;
+}
+
+.register-card .auth-brand {
+  margin-bottom: 20px;
+}
+
+.register-card .auth-header {
+  margin-bottom: 19px;
+}
+
+.register-card .auth-form {
+  gap: 13px;
+}
+
+.register-card .auth-field {
+  gap: 5px;
+}
+
+.register-card .auth-field input {
+  height: 36px;
+}
+
+.register-optional-row {
+  display: grid;
+  grid-template-columns: 1fr 1.08fr;
+  gap: 9px;
+  min-width: 0;
+}
+
+.register-optional-row .auth-field {
+  min-width: 0;
+}
+
+.register-optional-row .auth-field label span {
+  color: var(--moss);
+  font-weight: 400;
+}
+
+.register-optional-row input {
+  padding-left: 10px;
+  padding-right: 7px;
+}
+
+.register-card .auth-switch {
+  margin-top: 15px;
+}
+
+@media (max-width: 380px) {
+  .register-card {
+    padding: 23px 20px;
+  }
+
+  .register-optional-row {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+}

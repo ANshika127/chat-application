@@ -3,12 +3,13 @@ import "./NavigationRail.css";
 import { Home , MessageCircle, Bell, Settings , LogOut } from "lucide-react";
 import ConfirmationDialog from "./ConfirmationDialog";
 
-function NavigationRail({ activeView , setActiveView}) {
+function NavigationRail({ activeView , setActiveView, onLogout }) {
 
   const [ showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const handleLogoutCancel = () => {
     setShowLogoutDialog(false);
+    
   };
 
   return (
@@ -85,7 +86,7 @@ function NavigationRail({ activeView , setActiveView}) {
           onCancel = {handleLogoutCancel}
           onConfirm={()=>{
             setShowLogoutDialog(false);
-            alert("Logout will be connected during api integration.");
+            onLogout();
           }}
         />
       )}

@@ -30,7 +30,7 @@ function formatDate(date){
   });
 }
 
-function Profile(){
+function Profile( {onLogout} ){
   const [profile, setProfile ] = useState(initialProfile);
   const[isEditing, setIsEditing] = useState(false);
   const[showLogoutDialog, setShowLogoutDialog] = useState(false);
@@ -119,7 +119,7 @@ function Profile(){
           onCancel = {handleLogoutCancel}
           onConfirm={()=>{
             setShowLogoutDialog(false);
-            alert("Logout will be connected during api integration.");
+            onLogout();
           }}
         />
       )}

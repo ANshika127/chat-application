@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Circle, Eye, EyeOff } from "lucide-react";
 
+import { registerUser } from "../services/api";
 import "./Register.css";
 import "./Login.css";
 
@@ -14,7 +15,7 @@ function Register({ onRegister , onOpenLogin }){
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = (event) =>{
+  const handleSubmit = async (event) =>{
     event.preventDefault();
     if (
       !name.trim() ||
@@ -25,20 +26,30 @@ function Register({ onRegister , onOpenLogin }){
       setError("Please fill in all required fields.");
       return;
     }
-
     setError("");
 
-    if( onRegister) {
-      onRegister({
+    try{
+      const result = await registerUser({
         name: name.trim(),
         username: username.trim(),
         email: email.trim(),
         password,
-        phone: phone.trim(),
-        dob,
+        phone_no: phone.trim(),
+        dob: dob || null,
       });
+
+      if( onRegister) {
+        onRegister({
+          name: name.trim(),
+          username: username.trim(),
+          email: email.trim(),
+        });
+      }
+    } catch (error) {
+      setError(error.message || "Registration failed. Please try again.");
     }
   };
+
   return (
     <main className="auth-page">
       <section className="auth-card register-card">
@@ -134,7 +145,7 @@ function Register({ onRegister , onOpenLogin }){
               <input
                 id = "register-phone"
                 type="tel"
-                placeholder="+91"
+                placeholder="10-digits only"
                 value={phone}
                 onChange={(event)=> setPhone(event.target.value)}
                 autoComplete="tel"

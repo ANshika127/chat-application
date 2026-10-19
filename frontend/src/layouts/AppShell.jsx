@@ -119,11 +119,12 @@ const chats = [
 
 
 function AppShell() {
-  const [ selectedChat, setSelectedChat] = useState(null);
+  const [selectedChat, setSelectedChat] = useState(null);
   const [chatData, setChatData]= useState(chats);
   const [activeView, setActiveView] =useState("home");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authView, setAuthView] = useState("login");
+  const [authToken, setAuthToken] = useState(null);
 
 
   const handleSelectedChat = (chatId) =>{
@@ -169,20 +170,15 @@ function AppShell() {
     setSelectedChat(newChat.id);
   };
 
-  const handleLogin = ()=>{
+  const handleLogin = (loginData)=>{
+    setAuthToken(loginData.access_token);
     setIsAuthenticated(true);
     setSelectedChat(null);
     setActiveView("home");
   };
 
-  const handleRegister = (userData) =>{
-    console.log("Reg form submitted", {
-      ...userData,
-      password:"[hidden]",
-    });
-
-    setIsAuthenticated(true);
-    setActiveView("chats");
+  const handleRegister = () =>{
+    setAuthView("login")
   };
 
   const handleLogout= () =>{
@@ -239,12 +235,14 @@ function AppShell() {
                   selectedChat={selectedChat}
                   setSelectedChat={handleSelectedChat}
                   onNewChat={handleNewChat}
+                  authToken={authToken}
                 />
 
                 <ChatWorkspace
                   chats={chatData}
                   selectedChat={selectedChat}
                   setChatData={setChatData}
+                  authToken={authToken}
                 />
               </>
             )}

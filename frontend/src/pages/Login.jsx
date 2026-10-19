@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Circle, Eye, EyeOff } from "lucide-react";
-
+import { loginUser } from "../services/api";
 import "./Login.css";
 
 function Login({ onLogin, onOpenRegister }) {
@@ -9,7 +9,7 @@ function Login({ onLogin, onOpenRegister }) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!email.trim() || !password) {
@@ -17,8 +17,20 @@ function Login({ onLogin, onOpenRegister }) {
       return;
     }
     setError("");
-    onLogin();
+    try {
+      const result = await loginUser({
+        email: email.trim(),
+        password,
+      });
+
+      if(onLogin){
+        onLogin(result);
+      }
+    }catch (error) {
+      setError(error.message || "Login failed.Please try again.");
+    }
   };
+  
   return (
     <main className="auth-page">
       <section className="auth-card login-card">

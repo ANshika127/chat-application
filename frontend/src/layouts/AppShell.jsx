@@ -126,7 +126,7 @@ function AppShell() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authView, setAuthView] = useState("login");
   const [authToken, setAuthToken] = useState(null);
-
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   useEffect(()=>{
     if(!authToken){
@@ -138,37 +138,56 @@ function AppShell() {
       console.error("couldnt load chats:",error);
     });
   },[authToken])
+
   const fetchChats = async () => {
   const data = await apiRequest("/chats", {
     token: authToken,
   });
+  const formattedChats = await Promise.all(
+    data.chats.map(async (chat)=>{
+      const name= chat.other_user.name || chat.other_user.username;
 
-  const formattedChats = data.chats.map((chat) => ({
-    id: chat.chat_id,
-    contactId: chat.other_user.user_id,
-    name: chat.other_user.name || chat.other_user.username,
-    message: "",
-    time: "",
-    unread: 0,
-    avatar: (
-      chat.other_user.name || chat.other_user.username
-    ).charAt(0).toUpperCase(),
-    avatarColor: "avatar-olive",
-    messages: [],
-  }));
+      let latestMessage = "";
+      let latestTime ="";
+      
+      try{
+        const messageData = await apiRequest(`/chats/${chat.chat_id}/messages?limit=1`,{
+          token: authToken
+        });
 
+        const messages = messageData.messages || [];
+        const latest = messages[messages.length -1];
+
+        if(latest){
+          latestMessage = latest.content;
+          latestTime= latest.sent_at 
+            ? new Date(latest.sent_at).toLocaleTimeString([],{
+              hour: "2-digit",
+              minute:"2-digit",
+            })
+            : "";
+        }
+      } catch(error) {
+        console.error(
+          `Could not laod preview for chat ${chat.chat_id}:`,
+          error
+        );
+      }
+        return {
+        id: chat.chat_id,
+        contactId: chat.other_user.user_id,
+        name,
+        message: latestMessage || "No messages yet.",
+        time: latestTime,
+        unread: 0,
+        avatar: name.charAt(0).toUpperCase(),
+        avatarColor: "avatar-olive",
+        messages: [],
+      };
+    })
+  );
   setChatData(formattedChats);
 };
-  const handleSelectedChat = (chatId) =>{
-    setSelectedChat(chatId);
-    setActiveView("chats");
-
-    setChatData((previousChats)=>
-      previousChats.map((chat)=>
-        chat.id === chatId ? {...chat, unread: 0 } : chat
-      )
-    );
-  }
 
   const handleNewChat =  async (contact) =>{
     try{
@@ -181,7 +200,6 @@ function AppShell() {
       });
 
       await fetchChats();
-
       
       setSelectedChat(result.chat_id);
       setActiveView("chats");
@@ -190,8 +208,20 @@ function AppShell() {
     }
   };
 
+    const handleSelectedChat = (chatId) =>{
+    setSelectedChat(chatId);
+    setActiveView("chats");
+
+    setChatData((previousChats)=>
+      previousChats.map((chat)=>
+        chat.id === chatId ? {...chat, unread: 0 } : chat
+      )
+    );
+  }
+
   const handleLogin = (loginData)=>{
     setAuthToken(loginData.access_token);
+    setCurrentUserId(loginData.user_id);
     setIsAuthenticated(true);
     setSelectedChat(null);
     setActiveView("home");
@@ -263,6 +293,7 @@ function AppShell() {
                   selectedChat={selectedChat}
                   setChatData={setChatData}
                   authToken={authToken}
+                  currentUserId={currentUserId}
                 />
               </>
             )}

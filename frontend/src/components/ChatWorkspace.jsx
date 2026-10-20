@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { Paperclip, Smile , Send, MoreVertical, MessageCircle, MoveDownRight,Reply, Pencil,Trash2 } from "lucide-react";
+import { apiRequest } from "../services/api";
 import EmojiPicker from "emoji-picker-react";
 import ConfirmationDialog from "./ConfirmationDialog";
 import "./ChatWorkspace.css";
 
 
-function ChatWorkspace({ chats, selectedChat, setChatData }) {
+function ChatWorkspace({ chats, selectedChat, setChatData, authToken, currentUserId }) {
  
   const selectedChatData =chats.find(
     (chat) => chat.id === selectedChat
@@ -66,6 +67,50 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
       fileInputRef.current.value = "";
     }
   }, [selectedChat]);
+
+  useEffect(()=>{
+    if(!selectedChat || !authToken){
+      return;
+    }
+
+    let isActive = true;
+    const fetchMessages = async ()=>{
+      try{
+        const data = await apiRequest(`/chats/${selectedChat}/messages`,{
+          token: authToken
+        });
+
+        if (!isActive) return;
+
+        const formattedMessages = data.messages.map((message)=> ({
+          id: message.message_id,
+          type: Number(message.sender_id) === Number(currentUserId)? "outgoing" : "incoming",
+          content: message.content,
+          time: message.sent_at 
+            ? new Date(message.sent_at).toLocaleTimeString([],{
+              hour: "2-digit",
+              minute:"2-digit",
+            })
+            : "",
+            replyTo: null,
+        }));
+
+        setChatData((previousChats)=>
+          previousChats.map((chat)=>
+            chat.id === selectedChat
+            ? {...chat, messages: formattedMessages}
+            : chat
+        ));
+      } catch(error){
+        console.error("Couldnt load messages:",error);
+      }
+    };
+    fetchMessages();
+
+    return () => {
+      isActive = false;
+    };
+  }, [selectedChat,authToken,currentUserId, setChatData]);
 
 
   const handleSend =() => {

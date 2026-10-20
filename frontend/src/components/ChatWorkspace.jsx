@@ -82,18 +82,43 @@ function ChatWorkspace({ chats, selectedChat, setChatData, authToken, currentUse
 
         if (!isActive) return;
 
-        const formattedMessages = data.messages.map((message)=> ({
+        const messageMap = new Map(
+          data.messages.map((message)=> [
+            message.message_id,
+            message,
+          ])
+        );
+
+        const formattedMessages = data.messages.map((message)=>{
+          const originalMessage = message.reply_to_message_id
+          ? messageMap.get(message.reply_to_message_id)
+          : null;
+
+        return {
           id: message.message_id,
-          type: Number(message.sender_id) === Number(currentUserId)? "outgoing" : "incoming",
+          type:
+            Number(message.sender_id) === Number(currentUserId)
+              ? "outgoing"
+              : "incoming",
           content: message.content,
-          time: message.sent_at 
+          time: message.sent_at
             ? new Date(message.sent_at).toLocaleTimeString([],{
               hour: "2-digit",
-              minute:"2-digit",
-            })
+              minute: "2-digit",
+              })
             : "",
-            replyTo: null,
-        }));
+            replyTo: originalMessage 
+              ? {
+                id: originalMessage.message_id,
+                content: originalMessage.content,
+                author:
+                  Number(originalMessage.sender_id) === Number(currentUserId)
+                    ? "You"
+                    : selectedChatData?.name,
+                }
+              : null,
+          };
+        });
 
         setChatData((previousChats)=>
           previousChats.map((chat)=>
@@ -113,7 +138,7 @@ function ChatWorkspace({ chats, selectedChat, setChatData, authToken, currentUse
   }, [selectedChat,authToken,currentUserId, setChatData]);
 
 
-  const handleSend =() => {
+  const handleSend = async () => {
     if (!messageText.trim()){ 
       return;
     }
@@ -144,39 +169,55 @@ function ChatWorkspace({ chats, selectedChat, setChatData, authToken, currentUse
     }
 
 //Normal send message
-    const newMessage = {
-      id: Date.now(),
-      type: "outgoing",
-      content: trimmedText,
-      time: new Date().toLocaleTimeString([],{
-        hour:"2-digit",
-        minute:"2-digit"
-      }),
-      replyTo: replyingTo 
-        ? {
-            id: replyingTo.id,
-            content: replyingTo.content,
-            author:
-              replyingTo.type === "outgoing" ? "You" : selectedChatData.name,
+    try{
+      const result = await apiRequest(
+        `/chats/${selectedChat}/messages`,{
+          method: "POST",
+          token: authToken,
+          body: {
+            content: trimmedText,
+            message_type:"text",
+            reply_to_message_id: replyingTo?.id ?? null,
+          },
         }
-        :null,
-    };
+      );
+      const newMessage = {
+        id: result.message_id,
+        type: "outgoing",
+        content: trimmedText,
+        time: new Date().toLocaleTimeString([],{
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        replyTo: replyingTo
+          ? {
+              id: replyingTo.id,
+              content: replyingTo.content,
+              author:
+                replyingTo.type === "outgoing"
+                  ? "You"
+                  : selectedChatData.name,
+            }
+          : null,
+      };
 
-    setChatData((previousChats)=>
-      previousChats.map((chat)=>
-        chat.id === selectedChat
+      setChatData((previousChats)=>
+        previousChats.map((chat)=>
+          chat.id === selectedChat
           ? {
             ...chat,
             message: newMessage.content,
             time: newMessage.time,
             messages: [...chat.messages, newMessage],
-            }
+          }
           : chat
-      )
-    );
-
-    setMessageText("");
-    setReplyingTo(null);
+        )
+      );
+      setMessageText("");
+      setReplyingTo(null);
+    } catch(error){
+      console.error("Could not send message:",error);
+    }
   };
 
   if (!selectedChatData) {

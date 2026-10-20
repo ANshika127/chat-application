@@ -114,6 +114,10 @@
   font-weight: 600;
 }
 
+.avatar-olive {
+  background-color: var(--color-olive, #657447);
+}
+
 .new-chat-person-info {
   display: flex;
   flex: 1;

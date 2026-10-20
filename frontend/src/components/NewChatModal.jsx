@@ -1,22 +1,16 @@
-import { useState } from "react";
-import { Search, Plus, X, Section } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, Plus, X } from "lucide-react";
+import { apiRequest } from "../services/api";
 import "./NewChatModal.css";
 
-
-const demoContacts = [
-  { id: 101, name: "Abhay Mehta", username: "@abhay", avatar: "A", color: "avatar-orange" },
-  { id: 102, name: "Jaini Khatkar", username: "@jaini", avatar: "J", color: "avatar-blue" },
-  { id: 103, name: "Jasmine Kaur", username: "@jazz", avatar: "J", color: "avatar-purple" },
-  { id: 104, name: "Mom", username: "@mom.i", avatar: "M", color: "avatar-yellow" },
-  { id: 105, name: "Papa", username: "@papa", avatar: "P", color: "avatar-green" },
-];
-
-
-function NewChatModal({ onClose , onSelectContact }){
+function NewChatModal({ onClose , onSelectContact, authToken }){
 
   const [searchQuery , setSearchQuery] = useState("");
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading]= useState(true);
+  const [contactsError, setContactsError] = useState("");
 
-  const filteredContacts = demoContacts.filter((contact) =>{
+  const filteredContacts = contacts.filter((contact) =>{
     const query = searchQuery.toLowerCase().trim();
 
     return(
@@ -24,6 +18,41 @@ function NewChatModal({ onClose , onSelectContact }){
       contact.username.toLowerCase().includes(query)
     );
   });
+
+  useEffect(() => {
+    if(!authToken){
+      setLoading(false);
+      return;
+    }
+    const fetchContacts = async () =>{
+      try{
+        setContactsError("");
+
+        const data = await apiRequest("/users",{
+          token: authToken,
+        });
+
+        setContacts(
+          data.users.map((user) =>({
+            id: user.user_id,
+            name: user.name || user.username,
+            username: `@${user.username}`,
+            avatar:(user.name || user.username)
+              .charAt(0)
+              .toUpperCase(),
+            color: "avatar-olive",
+          }))
+        );
+      } catch (error){
+        setContactsError(
+          error.message || "Couldnt load users."
+        );
+      }finally{
+        setLoading(false);
+      }
+    };
+    fetchContacts();
+  },[authToken]);
 
   return(
     <div 
@@ -65,7 +94,11 @@ function NewChatModal({ onClose , onSelectContact }){
           />
         </div>
         <div className="new-chat-people">
-          {filteredContacts.length > 0 ?(
+          {loading ? (
+            <p className="new-chat-empty">Loading People...</p>
+          ):contactsError ? (
+            <p className="new-chat-empty">{contactsError}</p>
+          ): filteredContacts.length > 0 ? (
             filteredContacts.map((contact) => (
               <div className="new-chat-person" key={contact.id}>
                 <div className={`new-chat-avatar ${contact.color}`}>

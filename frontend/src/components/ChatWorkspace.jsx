@@ -318,6 +318,7 @@ function ChatWorkspace({ chats, selectedChat, setChatData }) {
             <h3>No messages yet</h3>
             <p>
               Say hello to {selectedChatData.name} to start the conversation.
+              
             </p>
           </div>
           )}

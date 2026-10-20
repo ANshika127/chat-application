@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect} from "react";
+import { apiRequest } from "../services/api";
 
 import ChatSidebar from "../components/ChatSidebar";
 import ChatWorkspace from "../components/ChatWorkspace";
@@ -9,7 +10,7 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 
 import "./AppShell.css";
-import { Contact } from "lucide-react";
+
 
 const chats = [
   {
@@ -120,13 +121,44 @@ const chats = [
 
 function AppShell() {
   const [selectedChat, setSelectedChat] = useState(null);
-  const [chatData, setChatData]= useState(chats);
+  const [chatData, setChatData]= useState([]);
   const [activeView, setActiveView] =useState("home");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authView, setAuthView] = useState("login");
   const [authToken, setAuthToken] = useState(null);
 
 
+  useEffect(()=>{
+    if(!authToken){
+      setChatData([]);
+      return;
+    }
+
+    fetchChats().catch((error)=>{
+      console.error("couldnt load chats:",error);
+    });
+  },[authToken])
+  const fetchChats = async () => {
+  const data = await apiRequest("/chats", {
+    token: authToken,
+  });
+
+  const formattedChats = data.chats.map((chat) => ({
+    id: chat.chat_id,
+    contactId: chat.other_user.user_id,
+    name: chat.other_user.name || chat.other_user.username,
+    message: "",
+    time: "",
+    unread: 0,
+    avatar: (
+      chat.other_user.name || chat.other_user.username
+    ).charAt(0).toUpperCase(),
+    avatarColor: "avatar-olive",
+    messages: [],
+  }));
+
+  setChatData(formattedChats);
+};
   const handleSelectedChat = (chatId) =>{
     setSelectedChat(chatId);
     setActiveView("chats");
@@ -138,36 +170,24 @@ function AppShell() {
     );
   }
 
-  const handleNewChat = (contact) =>{
-    const existingChat = chatData.find(
-      (chat)=>
-        chat.contactId === contact.id ||
-      chat.name === contact.name
-    );
+  const handleNewChat =  async (contact) =>{
+    try{
+      const result = await apiRequest("/chats",{
+        method: "POST",
+        token: authToken,
+        body: {
+          user_id: contact.id,
+        },
+      });
 
-    if(existingChat){
-      handleSelectedChat(existingChat.id);
-      return;
+      await fetchChats();
+
+      
+      setSelectedChat(result.chat_id);
+      setActiveView("chats");
+    } catch (error){
+      console.error("Couldnt create chat:",error);
     }
-
-    const newChat = {
-      id: Date.now(),
-      contactId: contact.id,
-      name: contact.name,
-      message: "No messages yet",
-      time: "",
-      unread: 0,
-      avatar: contact.avatar,
-      avatarColor: contact.color,
-      messages: [],
-    };
-
-    setChatData((previousChats)=>[
-      newChat,
-      ...previousChats,
-    ]);
-
-    setSelectedChat(newChat.id);
   };
 
   const handleLogin = (loginData)=>{

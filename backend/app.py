@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 import re
@@ -134,6 +134,25 @@ def login_user():
         "username": user.username,
         "name": user.name
     },200
+
+@app.route("/users", methods=["GET"])
+@jwt_required()
+def get_users():
+    current_user_id = int(get_jwt_identity())
+    users= User.query.filter(
+        User.user_id != current_user_id
+    ).all()
+
+    return jsonify({
+        "users":[
+            {
+                "user_id": user.user_id,
+                "username": user.username,
+                "name": user.name
+            }
+            for user in users
+        ]
+    }),200
 
 
 @app.route("/users/me", methods=["GET"])
